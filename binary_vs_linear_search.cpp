@@ -1,6 +1,6 @@
 /*
 Binary vs. linear search
-C++11 code by Galina - 24/03/2025
+C++11 code by Galina - 29/03/2025
 */
 
 #include <iostream>
@@ -9,58 +9,68 @@ C++11 code by Galina - 24/03/2025
 #include <algorithm>
 
 void test();
-std::pair<int, int> linear(const std::vector<int>&, int);
+int linear(const std::vector<int>&, int);
 std::pair<int, int> binary(const std::vector<int>&, int);
-int get_input();
-std::vector<int> get_data();
-void binary_vs_linear();
+bool get_input(int&);
+std::vector<int> get_vec();
+void binary_vs_linear(const std::vector<int>&);
 
 
 int main() {
     //test();
-    binary_vs_linear();
+    std::vector<int> vec = get_vec();
+    std::sort(vec.begin(), vec.end());
+    binary_vs_linear(vec);
     return 0;
 }
 
 
-void binary_vs_linear() {
-    std::vector<int> data = get_data();
-    std::sort(data.begin(), data.end());
-    int target = get_input();
-    auto res_b = binary(data, target);
-    if (res_b.first == -1) {
+void binary_vs_linear(const std::vector<int>& vec) {
+    int target {};
+    if(get_input(target)) {
+        auto res_b = binary(vec, target);
+        if (res_b.first != -1) {
+            std::cout << "\nYour number is " << target
+                << ".\nIt took " << res_b.second << " step(s) to find it using binary search.\nIt took "
+                << linear(vec, target) << " step(s) to find it using linear search.\n";
+                return;
+        }
         std::cout << "Number not found. Try again.\n";
-        binary_vs_linear();
-    } else {
-        auto res_l = linear(data, target);
-        std::cout << "\nYour number is " << target
-            << ".\nIt took " << res_b.second << " step(s) to find it using binary search.\nIt took "
-            << res_l.second << " step(s) to find it using linear search.\n";
     }
+    binary_vs_linear(vec);
 }
 
-std::vector<int> get_data() {
+std::vector<int> get_vec() {
     std::default_random_engine eng {};
     std::uniform_int_distribution<int> dist {0, 1000};
-    std::vector<int> data;
+    std::vector<int> vec;
     for (std::size_t i=0; i<1000; ++i) {
-        data.push_back(dist(eng));
+        vec.push_back(dist(eng));
     }
-    return data;
+    return vec;
 }
 
-int get_input() {
-    int target {};
+bool get_input(int& target) {
     std::cout << "Enter an integer between 0 and 1000\n";
-    std::cin >> target;
-    if (target < 0 || target > 1000) {
-        std::cout << "Invalid input\n";
-        target = get_input();
+    if (int num; std::cin >> num) {
+        if (num > 0 && num <= 1000) {
+            target = num;
+            return true;
+        }
     }
-    return target;
-
+    if (!std::cin) { // if not an integer
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    std::cout << "Invalid input\n";
+    return false;
 }
 
+/*
+Returns a pair consisting of the position of 'target'
+and the number of steps required to find it.
+If 'target' is not found, the position is set to -1.
+*/
 std::pair<int, int> binary(const std::vector<int>& data, int target) {
     std::size_t min_val = 0;
     std::size_t max_val = data.size() - 1;
@@ -79,13 +89,13 @@ std::pair<int, int> binary(const std::vector<int>& data, int target) {
     return {-1, cnt};
 }
 
-std::pair<int, int> linear(const std::vector<int>& data, int target) {
+int linear(const std::vector<int>& data, int target) { // Returns the number of steps required to find 'target'
     for (std::size_t i=0; i!=data.size()-1; ++i) {
         if (data[i] == target) {
-            return {i, i + 1};
+            return i + 1;
         }
     }
-    return {-1, data.size()};
+    return data.size();
 }
 
 
@@ -99,12 +109,12 @@ void test() {
     if (!(res.first == -1 && res.second == 4)) {
         std::cout << "Binary search failed\n";
     }
-    res = linear(vec, 5);
-    if (!(res.first == 2 && res.second == 3)) {
+    int res_l = linear(vec, 5);
+    if (!(res_l == 3)) {
         std::cout << "Linear search failed\n";
     }
-    res = linear(vec, 2);
-    if (!(res.first == -1 && res.second == 12)) {
+    res_l = linear(vec, 2);
+    if (!(res_l == 12)) {
         std::cout << "Linear search failed\n";
     }
 }
