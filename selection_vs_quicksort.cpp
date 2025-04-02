@@ -4,29 +4,19 @@
 #include <vector>
 #include <chrono>
 
-auto smallest_it(const std::vector<int>& vec) {
-    int smallest = vec.front();
-    auto it = vec.begin();
-    for (auto i=vec.begin()+1; i!=vec.end(); ++i) {
-        if (*i < smallest) {
-            smallest = *i;
-            it = i;
+void selection_sort(std::vector<int>& vec) {
+    for (std::size_t i=0; i<vec.size()-1; ++i) {
+        std::size_t smallest_index {i};
+        for (std::size_t j=i+1; j<vec.size(); ++j) {
+            if (vec[j] < vec[smallest_index]) {
+                smallest_index = j;
+            }
         }
+        std::swap(vec[i], vec[smallest_index]);
     }
-    return it;
 }
 
-std::vector<int> selection_sort(std::vector<int>& vec) {
-    std::vector<int> new_vec;
-    while (vec.size()) {
-        auto it = smallest_it(vec);
-        new_vec.push_back(*it);
-        vec.erase(it);
-    }
-    return new_vec;
-}
-
-void quicksort(std::vector<int>& vec, int low, int high) {
+void quicksort_rec(std::vector<int>& vec, int low, int high) {
     if ((vec.size() < 2) || (low >= high)) {
         return;
     }
@@ -38,8 +28,12 @@ void quicksort(std::vector<int>& vec, int low, int high) {
         }
     }
     std::swap(vec[high], vec[index]);
-    quicksort(vec, low, index-1);
-    quicksort(vec, index+1, high);
+    quicksort_rec(vec, low, index-1);
+    quicksort_rec(vec, index+1, high);
+}
+
+void quicksort(std::vector<int>& vec) {
+    quicksort_rec(vec, 0, vec.size()-1);
 }
 
 void print_vec(const std::vector<int>& vec) {
@@ -52,23 +46,23 @@ void print_vec(const std::vector<int>& vec) {
 
 int main() {
     std::vector<int> vec = {8, 23, 1, -5, -4, 25, 3, 5, 5, 67, 13, 13, 0, 17, 44, 8, -12, 34, 57, 12, 11, 17};
-    auto vec1 {vec}; // copy for quicksort
+    auto vec_copy {vec}; // copy for quicksort
     print_vec(vec); // initial vector
 
     auto t0 = std::chrono::system_clock::now();
-    auto sorted = selection_sort(vec);
+    selection_sort(vec);
     auto t1 = std::chrono::system_clock::now();
     std::cout << "\n\nSelection sort took "
         << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() << "ns\n";
 
 
     t0 = std::chrono::system_clock::now();
-    quicksort(vec1, 0, vec1.size()-1);
+    quicksort(vec_copy);
     t1 = std::chrono::system_clock::now();
     std::cout << "Quicksort took "
         << std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0).count() << "ns\n\n";
 
-    print_vec(vec1); // sorted vector
+    print_vec(vec_copy); // sorted vector
 
     return 0;
 }
