@@ -3,35 +3,27 @@
 #include <iostream>
 #include <vector>
 
-auto smallest_it(const std::vector<int>& vec) {
-    int smallest = vec.front();
-    auto it = vec.begin();
-    for (auto i=vec.begin()+1; i!=vec.end(); ++i) {
-        if (*i < smallest) {
-            smallest = *i;
-            it = i;
+void selection_sort(std::vector<int>& vec) {
+    for (std::size_t i=0; i<vec.size()-1; ++i) {
+        std::size_t smallest_index {i};
+        for (std::size_t j=i+1; j<vec.size(); ++j) {
+            if (vec[j] < vec[smallest_index]) {
+                smallest_index = j;
+            }
         }
+        std::swap(vec[i], vec[smallest_index]);
     }
-    return it;
-}
-
-std::vector<int> selection_sort(std::vector<int>& vec) {
-    std::vector<int> new_vec;
-    while (vec.size()) {
-        auto it = smallest_it(vec);
-        new_vec.push_back(*it);
-        vec.erase(it);
-    }
-    return new_vec;
 }
 
 void test_selection_sort() {
     std::vector<int> vec = {3, 5, 1, 8, 1, 4, -1, 0};
+    selection_sort(vec);
     std::vector<int> vec_sorted = {-1, 0, 1, 1, 3, 4, 5, 8};
-    if (vec_sorted != selection_sort(vec)) {
+    if (vec_sorted != vec) {
         std::cout << "Test failed\n";
     } else { std::cout << "Success\n"; }
 }
+
 
 int main() {
     test_selection_sort();
