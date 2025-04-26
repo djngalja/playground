@@ -38,12 +38,13 @@ int main()  {
 
     tb.add_column("Score", 10);
     tb.add_column("Password", 25);
+    tb.add_column("Has_id", 3);
 
     tb.add_row(23, "pswd1234");
-    tb.add_row(79, "fdhdg12ghfd4");
-    tb.add_row(13);
+    tb.add_row(79, "fdhdg12ghfd4", false);
+    tb.add_row(13, "dgfuyegf");
     tb.add_row(7);
-    tb.add_row(3366666743775, "hbdgw8r7gt5gc6tc78gfufbaebi");
+    tb.add_row(3366666743775, "hbdgw8r7gt5gc6tc78gfufbaebi", true);
 
     tb.print_border();
     tb.print_headers();
@@ -55,9 +56,10 @@ int main()  {
 
 
 void Table::add_column(const std::string& header, std::size_t width) {
-    columns.push_back(Column{header, width});
+    std::size_t final_width = (header.size() > width) ? header.size() : width;
+    columns.push_back(Column{header, final_width});
     if (table_width) { table_width++; };
-    table_width += width;
+    table_width += final_width;
     border = edge_style + std::string(table_width, hor_border_style) + edge_style + '\n';
 }
 
