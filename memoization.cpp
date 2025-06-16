@@ -48,7 +48,7 @@ int main() {
     std::cout << 'F' << n << " = " << fib_mem(n) << '\n';
     std::cout << "Using recursion: ";
     measure(n, &fib);
-    std::cout << "Optimization using memoisation: ";
+    std::cout << "Optimization using memoization: ";
     measure(n, &fib_mem);
     return 0;
 }
