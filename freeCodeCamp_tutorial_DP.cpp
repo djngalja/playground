@@ -14,18 +14,23 @@ June 2025
 int fib(int);
 long long grid_traveler(int, int);
 bool can_sum(int, const std::vector<int>&);
+bool how_sum(int, const std::vector<int>&, std::vector<int>&);
 // Memoization
 int fib(int, std::map<int, int>&);
 long long grid_traveler(int, int, std::map<std::string, long long>&);
 bool can_sum(int, const std::vector<int>&, std::map<int, bool>&);
+bool how_sum(int, const std::vector<int>&, std::vector<int>&, std::map<int, bool>&);
+
 
 
 
 int main() {
     std::map<int, bool> memo;
-    std::vector<int> nums {7, 14};
-    std::cout << can_sum(300, nums, memo);
+    std::vector<int> nums {7, 6, 4, 5};
+    std::vector<int> result;
+    std::cout << how_sum(100, nums, result, memo) << '\n';
 
+    for (int i : result) { std::cout << i << ' '; }
 
     return 0;
 }
@@ -50,6 +55,18 @@ bool can_sum(int target, const std::vector<int>& nums) {
     if (target < 0) { return false; }
     for (int num : nums) {
         if (can_sum(target - num, nums)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool how_sum(int target, const std::vector<int>& nums, std::vector<int>& result) {
+    if (target == 0) { return true; }
+    if (target < 0) { return false; }
+    for (int num : nums) {
+        if (how_sum(target - num, nums, result)) {
+            result.push_back(num);
             return true;
         }
     }
@@ -82,6 +99,23 @@ bool can_sum(int target, const std::vector<int>& nums, std::map<int, bool>& memo
     if (memo.find(target) != memo.end()) { return memo[target]; }
     for (int num : nums) {
         if (can_sum(target - num, nums, memo)) {
+            memo[target] = true;
+            return true;
+        }
+    }
+    memo[target] = false;
+    return false;
+}
+
+bool how_sum(int target, const std::vector<int>& nums, std::vector<int>& result, std::map<int, bool>& memo) {
+    if (target == 0) { return true; }
+    if (target < 0) { return false; }
+    if (memo.find(target) != memo.end()) {
+        return memo[target];
+    }
+    for (int num : nums) {
+        if (how_sum(target - num, nums, result, memo)) {
+            result.push_back(num);
             memo[target] = true;
             return true;
         }
