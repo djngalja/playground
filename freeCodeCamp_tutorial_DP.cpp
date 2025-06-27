@@ -15,22 +15,25 @@ int fib(int);
 long long grid_traveler(int, int);
 bool can_sum(int, const std::vector<int>&);
 bool how_sum(int, const std::vector<int>&, std::vector<int>&);
+std::pair<bool, std::vector<int>> best_sum(int, const std::vector<int>&);
 // Memoization
 int fib(int, std::map<int, int>&);
 long long grid_traveler(int, int, std::map<std::string, long long>&);
 bool can_sum(int, const std::vector<int>&, std::map<int, bool>&);
 bool how_sum(int, const std::vector<int>&, std::vector<int>&, std::map<int, bool>&);
+std::pair<bool, std::vector<int>> best_sum(int, const std::vector<int>&,
+    std::map<int, std::pair<bool, std::vector<int>>>&);
 
 
 
 
 int main() {
-    std::map<int, bool> memo;
-    std::vector<int> nums {7, 6, 4, 5};
-    std::vector<int> result;
-    std::cout << how_sum(100, nums, result, memo) << '\n';
+    std::map<int, std::pair<bool, std::vector<int>>> memo;
+    std::vector<int> nums {1, 2, 5, 25};
+    auto res = best_sum(100, nums, memo);
 
-    for (int i : result) { std::cout << i << ' '; }
+    std::cout << std::boolalpha << res.first << '\n';
+    for (int i : res.second) { std::cout << i << ' '; }
 
     return 0;
 }
@@ -71,6 +74,26 @@ bool how_sum(int target, const std::vector<int>& nums, std::vector<int>& result)
         }
     }
     return false;
+}
+
+std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& nums) {
+    if (target == 0) {
+        return std::make_pair(true, std::vector<int>());
+    }
+    if (target < 0) {
+        return std::make_pair(false, std::vector<int>());
+    }
+    auto shortest = std::make_pair(false, std::vector<int>());
+    for (int num : nums) {
+        auto remainder = best_sum(target - num, nums);
+        if (!remainder.first) { continue; }
+        auto combination = remainder;
+        combination.second.push_back(num);
+        if (shortest.second.empty() || combination.second.size() < shortest.second.size()) {
+            shortest = combination;
+        }
+    }
+    return shortest;
 }
 
 // Memoization
@@ -122,4 +145,27 @@ bool how_sum(int target, const std::vector<int>& nums, std::vector<int>& result,
     }
     memo[target] = false;
     return false;
+}
+
+std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& nums,
+    std::map<int, std::pair<bool, std::vector<int>>>& memo) {
+    if (memo.find(target) != memo.end()) { return memo[target]; }
+    if (target == 0) {
+        return std::make_pair(true, std::vector<int>());
+    }
+    if (target < 0) {
+        return std::make_pair(false, std::vector<int>());
+    }
+    auto shortest = std::make_pair(false, std::vector<int>());
+    for (int num : nums) {
+        auto remainder = best_sum(target - num, nums, memo);
+        if (!remainder.first) { continue; }
+        auto combination = remainder;
+        combination.second.push_back(num);
+        if (shortest.second.empty() || combination.second.size() < shortest.second.size()) {
+            shortest = combination;
+        }
+    }
+    memo[target] = shortest;
+    return shortest;
 }
