@@ -9,6 +9,7 @@ June 2025
 #include <iostream>
 #include <map>
 #include <vector>
+#include <string>
 
 // Brute force
 int fib(int);
@@ -16,6 +17,7 @@ long long grid_traveler(int, int);
 bool can_sum(int, const std::vector<int>&);
 bool how_sum(int, const std::vector<int>&, std::vector<int>&);
 std::pair<bool, std::vector<int>> best_sum(int, const std::vector<int>&);
+bool can_construct(const std::string&, const std::vector<std::string>&);
 // Memoization
 int fib(int, std::map<int, int>&);
 long long grid_traveler(int, int, std::map<std::string, long long>&);
@@ -23,20 +25,22 @@ bool can_sum(int, const std::vector<int>&, std::map<int, bool>&);
 bool how_sum(int, const std::vector<int>&, std::vector<int>&, std::map<int, bool>&);
 std::pair<bool, std::vector<int>> best_sum(int, const std::vector<int>&,
     std::map<int, std::pair<bool, std::vector<int>>>&);
+bool can_construct(const std::string&, const std::vector<std::string>&,
+    std::map<std::string, bool>&);
+
 
 
 
 
 int main() {
-    std::map<int, std::pair<bool, std::vector<int>>> memo;
-    std::vector<int> nums {1, 2, 5, 25};
-    auto res = best_sum(100, nums, memo);
-
-    std::cout << std::boolalpha << res.first << '\n';
-    for (int i : res.second) { std::cout << i << ' '; }
+    std::map<std::string, bool> memo;
+    std::vector<std::string> words {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"};
+    auto res = can_construct("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", words, memo);
+    std::cout << std::boolalpha << res << '\n';
 
     return 0;
 }
+
 
 
 
@@ -94,6 +98,17 @@ std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& n
         }
     }
     return shortest;
+}
+
+bool can_construct(const std::string& target, const std::vector<std::string>& words) {
+    if (target.empty()) { return true; }
+    for (const auto& word : words) {
+        if (target.find(word) != 0) { continue; }
+        if (can_construct(target.substr(word.size()), words)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Memoization
@@ -168,4 +183,19 @@ std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& n
     }
     memo[target] = shortest;
     return shortest;
+}
+
+bool can_construct(const std::string& target, const std::vector<std::string>& words,
+    std::map<std::string, bool>& memo) {
+    if (target.empty()) { return true; }
+    if (memo.find(target) != memo.end()) { return memo[target]; }
+    for (const auto& word : words) {
+        if (target.find(word) != 0) { continue; }
+        if (can_construct(target.substr(word.size()), words, memo)) {
+            memo[target] = true;
+            return true;
+        }
+    }
+    memo[target] = false;
+    return false;
 }
