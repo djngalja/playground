@@ -2,7 +2,7 @@
 Dynamic programming complete freeCodeCamp tutorial
 https://www.youtube.com/watch?v=oBt53YbR9Kk
 
-Rewritten in modern C++ by Galina
+The original JavaScript code rewritten in C++11 by Galina
 June 2025
 */
 
@@ -19,6 +19,8 @@ bool how_sum(int, const std::vector<int>&, std::vector<int>&);
 std::pair<bool, std::vector<int>> best_sum(int, const std::vector<int>&);
 bool can_construct(const std::string&, const std::vector<std::string>&);
 int count_construct(const std::string&, const std::vector<std::string>&);
+std::vector<std::vector<std::string>> all_construct(const std::string&,
+    const std::vector<std::string>&);
 // Memoization
 int fib(int, std::map<int, int>&);
 long long grid_traveler(int, int, std::map<std::string, long long>&);
@@ -30,16 +32,25 @@ bool can_construct(const std::string&, const std::vector<std::string>&,
     std::map<std::string, bool>&);
 int count_construct(const std::string&, const std::vector<std::string>&,
     std::map<std::string, int>&);
-
+std::vector<std::vector<std::string>> all_construct(const std::string&,
+    const std::vector<std::string>&,
+    std::map<std::string, std::vector<std::vector<std::string>>>&);
 
 
 
 
 int main() {
-    std::map<std::string, int> memo;
-    std::vector<std::string> words {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"};
-    auto res = count_construct("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", words, memo);
-    std::cout << res << '\n';
+    std::map<std::string, std::vector<std::vector<std::string>>> memo;
+    std::vector<std::string> words {"e", "ee", "eee", "eeee", "eeeee", "eeeeee", "eeeeeee"};
+    auto res = all_construct("eeeeeeeeeeeeeeeeeeeeeeeef", words, memo);
+
+    // Print results
+    for (const auto& vec : res) {
+        for (const auto& word : vec) {
+            std::cout << word << ' ';
+        }
+        std::cout << '\n';
+    }
 
     return 0;
 }
@@ -92,12 +103,11 @@ std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& n
     }
     auto shortest = std::make_pair(false, std::vector<int>());
     for (int num : nums) {
-        auto remainder = best_sum(target - num, nums);
-        if (!remainder.first) { continue; }
-        auto combination = remainder;
-        combination.second.push_back(num);
-        if (shortest.second.empty() || combination.second.size() < shortest.second.size()) {
-            shortest = combination;
+        auto res = best_sum(target - num, nums);
+        if (!res.first) { continue; }
+        res.second.push_back(num);
+        if (shortest.second.empty() || res.second.size() < shortest.second.size()) {
+            shortest = res;
         }
     }
     return shortest;
@@ -120,6 +130,21 @@ int count_construct(const std::string& target, const std::vector<std::string>& w
     for (const auto& word : words) {
         if (target.find(word) != 0) { continue; }
         result += count_construct(target.substr(word.size()), words);
+    }
+    return result;
+}
+
+std::vector<std::vector<std::string>> all_construct(const std::string& target,
+    const std::vector<std::string>& words) {
+    if (target.empty()) { return {{}}; }
+    std::vector<std::vector<std::string>> result;
+    for (const auto& word : words) {
+        if (target.find(word) != 0) { continue; }
+        auto res = all_construct(target.substr(word.size()), words);
+        for (auto& vec : res) {
+            vec.insert(vec.begin(), word);
+            result.push_back(vec);
+        }
     }
     return result;
 }
@@ -187,12 +212,11 @@ std::pair<bool, std::vector<int>> best_sum(int target, const std::vector<int>& n
     }
     auto shortest = std::make_pair(false, std::vector<int>());
     for (int num : nums) {
-        auto remainder = best_sum(target - num, nums, memo);
-        if (!remainder.first) { continue; }
-        auto combination = remainder;
-        combination.second.push_back(num);
-        if (shortest.second.empty() || combination.second.size() < shortest.second.size()) {
-            shortest = combination;
+        auto res = best_sum(target - num, nums, memo);
+        if (!res.first) { continue; }
+        res.second.push_back(num);
+        if (shortest.second.empty() || res.second.size() < shortest.second.size()) {
+            shortest = res;
         }
     }
     memo[target] = shortest;
@@ -222,6 +246,24 @@ int count_construct(const std::string& target, const std::vector<std::string>& w
     for (const auto& word : words) {
         if (target.find(word) != 0) { continue; }
         result += count_construct(target.substr(word.size()), words, memo);
+    }
+    memo[target] = result;
+    return result;
+}
+
+std::vector<std::vector<std::string>> all_construct(const std::string& target,
+    const std::vector<std::string>& words,
+    std::map<std::string, std::vector<std::vector<std::string>>>& memo) {
+    if (memo.find(target) != memo.end()) { return memo[target]; }
+    if (target.empty()) { return {{}}; }
+    std::vector<std::vector<std::string>> result;
+    for (const auto& word : words) {
+        if (target.find(word) != 0) { continue; }
+        auto res = all_construct(target.substr(word.size()), words, memo);
+        for (auto& vec : res) {
+            vec.insert(vec.begin(), word);
+            result.push_back(vec);
+        }
     }
     memo[target] = result;
     return result;
