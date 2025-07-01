@@ -35,22 +35,15 @@ int count_construct(const std::string&, const std::vector<std::string>&,
 std::vector<std::vector<std::string>> all_construct(const std::string&,
     const std::vector<std::string>&,
     std::map<std::string, std::vector<std::vector<std::string>>>&);
+// Tabulation
+long fib_tab(int);
+long grid_traveler_tab(int r, int c);
 
 
 
 
 int main() {
-    std::map<std::string, std::vector<std::vector<std::string>>> memo;
-    std::vector<std::string> words {"e", "ee", "eee", "eeee", "eeeee", "eeeeee", "eeeeeee"};
-    auto res = all_construct("eeeeeeeeeeeeeeeeeeeeeeeef", words, memo);
-
-    // Print results
-    for (const auto& vec : res) {
-        for (const auto& word : vec) {
-            std::cout << word << ' ';
-        }
-        std::cout << '\n';
-    }
+    std::cout << fib_tab(50) << '\n';
 
     return 0;
 }
@@ -148,6 +141,7 @@ std::vector<std::vector<std::string>> all_construct(const std::string& target,
     }
     return result;
 }
+
 
 // Memoization
 int fib(int n, std::map<int, int>& memo) {
@@ -267,4 +261,32 @@ std::vector<std::vector<std::string>> all_construct(const std::string& target,
     }
     memo[target] = result;
     return result;
+}
+
+
+// Tabulation
+long fib_tab(int n) {
+    std::vector<long> table(n + 2, 0);
+    table.at(1) = 1;
+    for (int i = 0; i != n; ++i) {
+        table.at(i + 1) += table.at(i);
+        table.at(i + 2) += table.at(i);
+    }
+    return table.at(n);
+}
+
+long grid_traveler_tab(int r, int c) {
+    std::vector<std::vector<long>> table(r + 1, std::vector<long>(c + 1));
+    table[1][1] = 1;
+    for (int i = 0; i <= r; ++i) {
+        for (int j = 0; j <= c; ++j) {
+            if (i + 1 <= r) {
+                table[i + 1][j] += table[i][j];
+            }
+            if (j + 1 <= c) {
+                table[i][j + 1] += table[i][j];
+            }
+        }
+    }
+    return table[r][c];
 }
