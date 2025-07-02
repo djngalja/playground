@@ -38,12 +38,14 @@ std::vector<std::vector<std::string>> all_construct(const std::string&,
 // Tabulation
 long fib_tab(int);
 long grid_traveler_tab(int r, int c);
+bool can_sum_tab(int, const std::vector<int>&);
 
 
 
 
 int main() {
-    std::cout << fib_tab(50) << '\n';
+    std::vector<int> nums {7, 14};
+    std::cout << std::boolalpha << can_sum_tab(300, nums) << '\n';
 
     return 0;
 }
@@ -289,4 +291,17 @@ long grid_traveler_tab(int r, int c) {
         }
     }
     return table[r][c];
+}
+
+bool can_sum_tab(int target, const std::vector<int>& nums) {
+    std::vector<bool> table(target + 1);
+    table[0] = true;
+    for (int i = 0; i <= target; ++i) {
+        if (!table[i]) { continue; }
+        for (int num : nums) {
+            if (i + num > target) { continue; }
+            table[i + num] = true;
+        }
+    }
+    return table[target];
 }
