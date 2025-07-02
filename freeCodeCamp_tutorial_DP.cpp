@@ -39,13 +39,15 @@ std::vector<std::vector<std::string>> all_construct(const std::string&,
 long fib_tab(int);
 long grid_traveler_tab(int r, int c);
 bool can_sum_tab(int, const std::vector<int>&);
+std::vector<int> how_sum_tab(int, const std::vector<int>&);
 
 
 
 
 int main() {
     std::vector<int> nums {7, 14};
-    std::cout << std::boolalpha << can_sum_tab(300, nums) << '\n';
+    auto result = how_sum_tab(300, nums);
+    for (int num : result) { std::cout << num << ' '; }
 
     return 0;
 }
@@ -301,6 +303,20 @@ bool can_sum_tab(int target, const std::vector<int>& nums) {
         for (int num : nums) {
             if (i + num > target) { continue; }
             table[i + num] = true;
+        }
+    }
+    return table[target];
+}
+
+std::vector<int> how_sum_tab(int target, const std::vector<int>& nums) {
+    std::vector<std::vector<int>> table(target + 1);
+    for (int i = 0; i <= target; ++i) {
+        // Skip i = 0
+        if (i && table[i].empty()) { continue; }
+        for (int num : nums) {
+            if (i + num > target) { continue; }
+            table[i + num] = table[i];
+            table[i + num].push_back(num);
         }
     }
     return table[target];
