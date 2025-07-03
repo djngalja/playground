@@ -41,6 +41,7 @@ long grid_traveler_tab(int r, int c);
 bool can_sum_tab(int, const std::vector<int>&);
 std::vector<int> how_sum_tab(int, const std::vector<int>&);
 std::vector<int> best_sum_tab(int, const std::vector<int>&);
+bool can_construct_tab(const std::string&, const std::vector<std::string>&);
 
 // Utility function
 void print_res(const std::vector<int>& result) {
@@ -57,10 +58,10 @@ void print_res(const std::vector<int>& result) {
 
 
 int main() {
-    print_res(best_sum_tab(7, {5, 3, 4, 7}));
-    print_res(best_sum_tab(8, {2, 3, 5}));
-    print_res(best_sum_tab(8, {1, 4, 5}));
-    print_res(best_sum_tab(100, {1, 2, 5, 25}));
+    std::cout << std::boolalpha << can_construct_tab("abcdef", {"ab", "abc", "cd", "def", "abcd"}) << '\n';
+    std::cout << can_construct_tab("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}) << '\n';
+    std::cout << can_construct_tab("enterapotentpot", {"a", "p", "ent", "enter", "ot", "o", "t"}) << '\n';
+    std::cout << can_construct_tab("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}) << '\n';
 
     return 0;
 }
@@ -350,4 +351,18 @@ std::vector<int> best_sum_tab(int target, const std::vector<int>& nums) {
         }
     }
     return table[target];
+}
+
+bool can_construct_tab(const std::string& target, const std::vector<std::string>& words) {
+    std::vector<bool> table(target.size() + 1);
+    table[0] = true;
+    for (std::size_t i = 0; i <= target.size(); ++i) {
+        if (!table[i]) { continue; }
+        for (const auto& word : words) {
+            if (i + word.size() <= target.size() && target.substr(i, word.size()) == word) {
+                table[i + word.size()] = true;
+            }
+        }
+    }
+    return table[target.size()];
 }
