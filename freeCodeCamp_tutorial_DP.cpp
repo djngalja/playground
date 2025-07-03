@@ -40,14 +40,27 @@ long fib_tab(int);
 long grid_traveler_tab(int r, int c);
 bool can_sum_tab(int, const std::vector<int>&);
 std::vector<int> how_sum_tab(int, const std::vector<int>&);
+std::vector<int> best_sum_tab(int, const std::vector<int>&);
+
+// Utility function
+void print_res(const std::vector<int>& result) {
+    if (result.empty()) {
+        std::cout << "null";
+    }
+    for (int num : result) {
+        std::cout << num << ' ';
+    }
+    std::cout << '\n';
+}
 
 
 
 
 int main() {
-    std::vector<int> nums {7, 14};
-    auto result = how_sum_tab(300, nums);
-    for (int num : result) { std::cout << num << ' '; }
+    print_res(best_sum_tab(7, {5, 3, 4, 7}));
+    print_res(best_sum_tab(8, {2, 3, 5}));
+    print_res(best_sum_tab(8, {1, 4, 5}));
+    print_res(best_sum_tab(100, {1, 2, 5, 25}));
 
     return 0;
 }
@@ -317,6 +330,23 @@ std::vector<int> how_sum_tab(int target, const std::vector<int>& nums) {
             if (i + num > target) { continue; }
             table[i + num] = table[i];
             table[i + num].push_back(num);
+        }
+    }
+    return table[target];
+}
+
+std::vector<int> best_sum_tab(int target, const std::vector<int>& nums) {
+    std::vector<std::vector<int>> table(target + 1);
+    for (int i = 0; i <= target; ++i) {
+        // Skip all empty elements except the 1st one
+        if (i && table[i].empty()) { continue; }
+        for (int num : nums) {
+            if (num + i > target) { continue; }
+            auto new_val = table[i];
+            new_val.push_back(num);
+            if (table[num + i].empty() || new_val.size() < table[num + i].size()) {
+                table[num + i] = new_val;
+            }
         }
     }
     return table[target];
