@@ -42,14 +42,19 @@ bool can_sum_tab(int, const std::vector<int>&);
 std::vector<int> how_sum_tab(int, const std::vector<int>&);
 std::vector<int> best_sum_tab(int, const std::vector<int>&);
 bool can_construct_tab(const std::string&, const std::vector<std::string>&);
+int count_construct_tab(const std::string&, const std::vector<std::string>&);
+std::vector<std::vector<std::string>> all_construct_tab(const std::string&, const std::vector<std::string>&);
 
 // Utility function
-void print_res(const std::vector<int>& result) {
+void print_res(const std::vector<std::vector<std::string>>& result) {
     if (result.empty()) {
         std::cout << "null";
     }
-    for (int num : result) {
-        std::cout << num << ' ';
+    for (const auto& vec : result) {
+        for (const auto& str : vec) {
+            std::cout << str << ' ';
+        }
+        std::cout << '\n';
     }
     std::cout << '\n';
 }
@@ -58,11 +63,10 @@ void print_res(const std::vector<int>& result) {
 
 
 int main() {
-    std::cout << std::boolalpha << can_construct_tab("abcdef", {"ab", "abc", "cd", "def", "abcd"}) << '\n';
-    std::cout << can_construct_tab("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}) << '\n';
-    std::cout << can_construct_tab("enterapotentpot", {"a", "p", "ent", "enter", "ot", "o", "t"}) << '\n';
-    std::cout << can_construct_tab("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeef", {"e", "ee", "eee", "eeee", "eeeee", "eeeeee"}) << '\n';
-
+    print_res(all_construct_tab("abcdef", {"ab", "abc", "cd", "def", "abcd", "ef", "c"}));
+    print_res(all_construct_tab("purple", {"purp", "p", "ur", "le", "purpl"}));
+    print_res(all_construct_tab("skateboard", {"bo", "rd", "ate", "t", "ska", "sk", "boar"}));
+    print_res(all_construct_tab("aaaaaaaaaaaz", {"a", "aa", "aaa", "aaaa", "aaaaa"}));
     return 0;
 }
 
@@ -361,6 +365,38 @@ bool can_construct_tab(const std::string& target, const std::vector<std::string>
         for (const auto& word : words) {
             if (i + word.size() <= target.size() && target.substr(i, word.size()) == word) {
                 table[i + word.size()] = true;
+            }
+        }
+    }
+    return table[target.size()];
+}
+
+int count_construct_tab(const std::string& target, const std::vector<std::string>& words) {
+    std::vector<int> table(target.size() + 1);
+    table[0] = 1;
+    for (std::size_t i = 0; i <= target.size(); ++i) {
+        if (!table[i]) { continue; }
+        for (const auto& word : words) {
+            if (i + word.size() <= target.size() && target.substr(i, word.size()) == word) {
+                table[i + word.size()] += table[i];
+            }
+        }
+    }
+    return table[target.size()];
+}
+
+std::vector<std::vector<std::string>> all_construct_tab(const std::string& target, const std::vector<std::string>& words) {
+    std::vector<std::vector<std::vector<std::string>>> table(target.size() + 1);
+    table[0] = {{}};
+    for (std::size_t i = 0; i <= target.size(); ++i) {
+        if (table[i].empty()) { continue; }
+        for (const auto& word : words) {
+            if (i + word.size() <= target.size() && target.substr(i, word.size()) == word) {
+                std::vector<std::vector<std::string>> new_vals(table[i]);
+                for (auto& vec : new_vals) {
+                    vec.push_back(word);
+                }
+                table[i + word.size()].insert(table[i + word.size()].end(), new_vals.begin(), new_vals.end());
             }
         }
     }
