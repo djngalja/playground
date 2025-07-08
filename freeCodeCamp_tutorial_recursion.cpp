@@ -15,8 +15,7 @@ July 2025
 
 // Reverse a string
 std::string reverse_str(const std::string& input) {
-    if (input.empty()) { return ""; }
-    return reverse_str(input.substr(1)) + input.front();
+    return input.empty() ? "" : reverse_str(input.substr(1)) + input.front();
 }
 
 
@@ -34,8 +33,7 @@ bool is_palindrome(const std::string& input) {
 
 // Decimal to binary converter (the additional function deals with edge cases)
 std::string find_binary_rec(int decimal) {
-    if (decimal == 0) { return ""; }
-    return find_binary_rec(decimal / 2) + std::to_string(decimal % 2);
+    return decimal == 0 ? "" : find_binary_rec(decimal / 2) + std::to_string(decimal % 2);
 
 }
 
@@ -50,8 +48,7 @@ std::string find_binary(int decimal) { // <-- Call this function
 
 // Calculate the sum of natural numbers
 int summation(int input) {
-    if (input <= 1) { return input; }
-    return input + summation(input - 1);
+    return input <= 1 ? input : input + summation(input - 1);
 }
 
 
@@ -85,6 +82,7 @@ long fib(long n) {
 int main() {
     std::vector test_vec {-4, -1, 0, 0, 3, 6, 12, 23, 23, 26, 29, 30};
     std::cout << binary_s(29, test_vec) << '\n';
-    std::cout << fib(8) << '\n';
+    std::cout << find_binary(50) << '\n';
+    std::cout << reverse_str("hello world") << '\n';
     return 0;
 }
