@@ -5,7 +5,8 @@
 #include <vector>
 #include <map>
 
-bool get_msg(const std::string&, const std::map<std::string, std::string>&, std::vector<std::string>&);
+//bool get_msg(const std::string&, const std::map<std::string, std::string>&, std::vector<std::string>&);
+std::vector<std::string> get_msg(const std::string&, const std::map<std::string, std::string>&);
 std::string encode_word(const std::string&);
 std::string decode_msg(const std::string&, const std::vector<std::string>&);
 void test(const std::string&, const std::vector<std::string>&);
@@ -46,8 +47,8 @@ std::string decode_msg(const std::string& s, const std::vector<std::string>& dic
     for (const auto& word : dictionary) {
         new_dictionary[word] = encode_word(word);
     }
-    std::vector<std::string> words_found;
-    if (get_msg(s, new_dictionary, words_found)) {
+    std::vector<std::string> words_found = get_msg(s, new_dictionary);
+    if (!words_found.empty()) {
         for (const auto& str : words_found) { msg += str + ' '; }
         msg.pop_back();
     }
@@ -82,6 +83,26 @@ std::string encode_word(const std::string& word) {
 }
 
 
+// Solve using tabulation
+std::vector<std::string> get_msg(const std::string& s, const std::map<std::string, std::string>& new_dictionary) {
+    std::vector<std::vector<std::string>> table(s.size() + 1);
+    for (std::size_t i = 0; i <= s.size(); ++i) {
+        if (i && table[i].empty()) { continue; }
+        for (const auto& word : new_dictionary) {
+            if (word.second == s.substr(i, word.second.size())) {
+                table[i + word.second.size()] = table[i];
+                table[i + word.second.size()].push_back(word.first);
+            }
+        }
+    }
+    return table[s.size()];
+}
+
+
+/*
+
+// Alternative brute force solution
+
 bool get_msg(const std::string& s, const std::map<std::string, std::string>& new_dictionary,
     std::vector<std::string>& result) {
     if (s.empty()) { return true; }
@@ -94,3 +115,5 @@ bool get_msg(const std::string& s, const std::map<std::string, std::string>& new
     }
     return false;
 }
+
+*/
