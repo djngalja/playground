@@ -10,6 +10,7 @@ July 2025
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <stdexcept>
 
 
@@ -71,18 +72,51 @@ int binary_s(int target, const std::vector<int>& vec) { // <-- Call this functio
 
 // Non-optimized fibonacci
 long fib(long n) {
-    if (n == 0) { return 0; }
-    if (n == 1) { return 1; }
-    return fib(n - 1) + fib(n - 2);
+    return n <= 1 ? n : fib(n - 1) + fib(n - 2);
+}
+
+
+// Merge sort
+void merge_sorted(std::vector<int>& data, std::size_t first, std::size_t mid, std::size_t last) {
+    std::vector<int> temp;
+    std::size_t i {first};
+    std::size_t j {mid + 1};
+    while (i <= mid && j <= last) {
+        if (data[i] <= data[j]) {
+            temp.push_back(data[i++]);
+        } else {
+            temp.push_back(data[j++]);
+        }
+    }
+    while (i <= mid) {
+        temp.push_back(data[i++]);
+    }
+    while (j <= last) {
+        temp.push_back(data[j++]);
+    }
+    std::copy(temp.begin(), temp.end(), data.begin() + first);
+}
+
+void merge_sort_rec(std::vector<int>& data, std::size_t first, std::size_t last) {
+    if (first < last) {
+        std::size_t mid = (first + last) / 2;
+        merge_sort_rec(data, first, mid);
+        merge_sort_rec(data, mid + 1, last);
+        merge_sorted(data, first, mid, last);
+    }
+}
+
+void merge_sort(std::vector<int>& data) { // <-- Call this function
+    if (data.size() <= 1) { return; }
+    merge_sort_rec(data, 0, data.size() - 1);
 }
 
 
 
 
 int main() {
-    std::vector test_vec {-4, -1, 0, 0, 3, 6, 12, 23, 23, 26, 29, 30};
-    std::cout << binary_s(29, test_vec) << '\n';
-    std::cout << find_binary(50) << '\n';
-    std::cout << reverse_str("hello world") << '\n';
+    std::vector test_vec {7, -1, 0, 13, 3, 9, 6, 23, 23, -4, 29, 15, 0};
+    merge_sort(test_vec);
+    for (int num : test_vec) { std::cout << num << ' '; }
     return 0;
 }
