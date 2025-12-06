@@ -3,48 +3,43 @@
 Given a string, find the length of the longest substring T that contains at most k distinct characters.
 
 Example 1:
-
 Input: s = "eceba", k = 2
 Output: 3
 Explanation: T is "ece" which its length is 3.
 
 Example 2:
-
 Input: s = "aa", k = 1
 Output: 2
 Explanation: T is "aa" which its length is 2.
+
+Constraints:
+1 <= s.length <= 5 * 104
+0 <= k <= 50
 */
 
 #include <iostream>
 #include <string>
 #include <unordered_map>
 
-int main() {
-    std::string s = "eceba";
-    size_t k = 2; 
-
-    int sz = s.size();
-    int n_max{}; // Result
-    int pos_max{};
-
+int lengthOfLongestSubstringKDistinct(std::string s, int k) {
+    int res{};
     int left{};
-    int right{};
     std::unordered_map<char, int> cnt;
-    for (int i = 0; i < sz; ++i) {
-        ++cnt[s[i]];
-        ++right;
+    for (int right = 0; right < s.size(); ++right) {
+        ++cnt[s[right]];
         while (cnt.size() > k) {
             --cnt[s[left]];
             if (cnt[s[left]] == 0) { cnt.erase(s[left]); }
             ++left;
         }
-        if (right - left > n_max) {
-            n_max = right - left;
-            pos_max = left;
+        if (right - left + 1 > res) {
+            res = right - left + 1;
         }
     }
+    return res;
+}
 
-    std::cout << s.substr(pos_max, n_max);
-
+int main() {
+    std::cout << lengthOfLongestSubstringKDistinct("eceba", 2);
     return 0;
 }
